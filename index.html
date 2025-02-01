@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple To-Do List App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        min-height: 100vh; /* Full viewport height */
+        box-sizing: border-box;
+      }
+      h1 {
+        text-align: center;
+        font-size: 1.8rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      h1 .icon {
+        margin-right: 10px;
+        font-size: 2rem;
+      }
+      .container {
+        max-width: 600px; /* Maximum width for larger screens */
+        min-width: 300px; /* Minimum width for smaller screens */
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        min-height: 200px; /* Minimum height to avoid looking too short */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+      }
+      input[type="text"] {
+        width: calc(100% - 22px);
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+      input[type="text"]:focus {
+        border-color: #007bff;
+        outline: none;
+      }
+      button {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1; /* Allow the list to grow and fill available space */
+      }
+      li {
+        background: #f9f9f9;
+        margin-bottom: 10px;
+        padding: 12px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        font-size: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      li .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      li span.task-text {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: 10px;
+        cursor: pointer;
+      }
+      li span.task-text.full-text {
+        white-space: normal;
+        word-break: break-word;
+      }
+      li .timestamp {
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+      .task-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .delete-btn,
+      .edit-btn,
+      .cancel-btn {
+        border: none;
+        padding: 0;
+        width: 30px; /* Default size for desktop */
+        height: 30px; /* Default size for desktop */
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.8rem; /* Smaller icon size */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.3s ease;
+      }
+      .edit-btn {
+        background-color: #ffc107;
+        color: black;
+      }
+      .delete-btn {
+        background-color: #dc3545;
+        color: white;
+      }
+      .cancel-btn {
+        background-color: #6c757d;
+        color: white;
+      }
+      .edit-btn:hover {
+        background-color: #e0a800;
+      }
+      .delete-btn:hover {
+        background-color: #c82333;
+      }
+      .cancel-btn:hover {
+        background-color: #5a6268;
+      }
+      .completed {
+        text-decoration: line-through;
+        color: #6c757d;
+      }
+      .icon {
+        font-size: 1.2rem;
+      }
+      .load-more-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        text-align: center;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+      }
+      .load-more-btn:hover {
+        background-color: #0056b3;
+      }
+      .load-more-btn .icon {
+        margin-right: 10px;
+      }
+      footer {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
+      }
+      footer span {
+        font-weight: bold;
+        color: #333;
+      }
+
+      /* Empty State Message */
+      .empty-state {
+        text-align: center;
+        font-size: 1rem;
+        color: #6c757d;
+        margin-top: 20px;
+      }
+
+      /* Tablet Responsiveness */
+      @media (max-width: 900px) {
+        .container {
+          padding: 15px;
+        }
+        input[type="text"],
+        button {
+          font-size: 0.9rem;
+        }
+        .delete-btn,
+        .edit-btn,
+        .cancel-btn {
+          font-size: 0.7rem; /* Smaller icons for tablets */
+          width: 28px; /* Smaller buttons for tablets */
+          height: 28px; /* Smaller buttons for tablets */
+        }
+        li span.task-text {
+          font-size: 0.9rem;
+        }
+        footer {
+          font-size: 0.8rem;
+        }
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 600px) {
+        .container {
+          padding: 10px;
+        }
+        input[type="text"],
+        button {
+          font-size: 0.8rem;
+        }
+        .delete-btn,
+        .edit-btn,
+        .cancel-btn {
+          font-size: 0.6rem; /* Even smaller icons for mobile */
+          width: 24px; /* Even smaller buttons for mobile */
+          height: 24px; /* Even smaller buttons for mobile */
+        }
+        li span.task-text {
+          font-size: 0.8rem;
+        }
+        footer {
+          font-size: 0.7rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1><span class="icon">&#128204;</span> Simple To-Do List App</h1>
+      <input
+        type="text"
+        id="taskInput"
+        placeholder="Enter a new task"
+        onkeypress="handleKeyPress(event)"
+      />
+      <button onclick="addTask()"><span class="icon">+</span></button>
+      <ul id="taskList"></ul>
+      <div id="emptyState" class="empty-state" style="display: none">
+        No tasks yet!
+      </div>
+      <button
+        class="load-more-btn"
+        id="loadMoreBtn"
+        style="display: none"
+        onclick="loadMoreTasks()"
+      >
+        <span class="icon">&#8681;</span> Load More
+      </button>
+      <footer>
+        Created by <span>@clevernat</span> |
+        <span id="currentDate"></span>
+      </footer>
+    </div>
+
+    <script>
+      let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      let editIndex = null;
+      const TASKS_PER_PAGE = 5;
+      let visibleTasksCount = TASKS_PER_PAGE;
+
+      function renderTasks() {
+        const taskList = document.getElementById("taskList");
+        taskList.innerHTML = "";
+        const emptyState = document.getElementById("emptyState");
+
+        if (tasks.length === 0) {
+          // Show the empty state message if no tasks exist
+          emptyState.style.display = "block";
+        } else {
+          emptyState.style.display = "none";
+        }
+
+        const visibleTasks = tasks.slice(0, visibleTasksCount);
+
+        visibleTasks.forEach((task, index) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+          <div class="task-header">
+            <span class="task-text ${
+              task.completed ? "completed" : ""
+            }" onclick="toggleFullText(this)">${task.name}</span>
+            <span class="timestamp">${formatTimestamp(task.timestamp)}</span>
+          </div>
+          <div class="task-actions">
+            <button class="edit-btn" onclick="editTask(${index})"><span class="icon">&#9998;</span></button>
+            <button class="delete-btn" onclick="deleteTask(${index})"><span class="icon">&#128465;</span></button>
+            <button class="cancel-btn" onclick="toggleCancel(${index})">
+              <span class="icon">${
+                task.completed ? "&#8635;" : "&#10006;"
+              }</span>
+            </button>
+          </div>
+        `;
+          taskList.appendChild(li);
+        });
+
+        // Show or hide the "Load More" button
+        const loadMoreBtn = document.getElementById("loadMoreBtn");
+        if (visibleTasksCount < tasks.length) {
+          loadMoreBtn.style.display = "block";
+        } else {
+          loadMoreBtn.style.display = "none";
+        }
+
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      }
+
+      function addTask() {
+        const taskInput = document.getElementById("taskInput");
+        const task = taskInput.value.trim();
+        if (task === "") {
+          alert("Task cannot be empty!");
+          return;
+        }
+        if (editIndex !== null) {
+          tasks[editIndex].name = task;
+          tasks[editIndex].timestamp = new Date().toISOString(); // Update timestamp
+          editIndex = null;
+        } else {
+          tasks.unshift({
+            name: task,
+            completed: false,
+            timestamp: new Date().toISOString(),
+          }); // Add to the beginning
+        }
+        taskInput.value = "";
+        visibleTasksCount = TASKS_PER_PAGE; // Reset visible tasks count
+        renderTasks();
+      }
+
+      function deleteTask(index) {
+        tasks.splice(index, 1);
+        visibleTasksCount = Math.min(visibleTasksCount, tasks.length); // Adjust visible tasks count
+        renderTasks();
+      }
+
+      function editTask(index) {
+        const taskInput = document.getElementById("taskInput");
+        taskInput.value = tasks[index].name;
+        editIndex = index;
+      }
+
+      function toggleCancel(index) {
+        // Toggle the completed state of the task
+        tasks[index].completed = !tasks[index].completed;
+        renderTasks(); // Re-render to update the UI
+      }
+
+      function handleKeyPress(event) {
+        if (event.key === "Enter") {
+          addTask();
+        }
+      }
+
+      function toggleFullText(element) {
+        element.classList.toggle("full-text");
+      }
+
+      function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`;
+      }
+
+      function loadMoreTasks() {
+        visibleTasksCount += TASKS_PER_PAGE;
+        renderTasks();
+      }
+
+      // Dynamic Date in Footer
+      function updateCurrentDate() {
+        const currentDateElement = document.getElementById("currentDate");
+        const now = new Date();
+        const options = { month: "long", year: "numeric" };
+        currentDateElement.textContent = now.toLocaleDateString(
+          "en-US",
+          options
+        );
+      }
+
+      // Initial rendering of tasks and dynamic date
+      renderTasks();
+      updateCurrentDate();
+
+      // Update the date dynamically every day at midnight
+      setInterval(() => {
+        const now = new Date();
+        const nextMidnight = new Date(now);
+        nextMidnight.setHours(24, 0, 0, 0); // Set to next midnight
+        const timeUntilMidnight = nextMidnight - now;
+
+        setTimeout(() => {
+          updateCurrentDate();
+        }, timeUntilMidnight);
+      }, 1000);
+    </script>
+  </body>
+</html>
